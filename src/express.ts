@@ -1,6 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
-import { EXPRESS_FULL_URL, SOLID_DOMAIN } from "./config/default";
-import { sessionStore } from "./sharedSessions";
+
+export const EXPRESS_PORT = +(process.env.EXPRESS_PORT || 8000)
+
+export const EXPRESS_FULL_URL = process.env.EXPRESS_FULL_URL || `http://localhost:${EXPRESS_PORT}`
+
+export const SOLID_DOMAIN = process.env.SOLID_DOMAIN ?? "https://solidcommunity.net"
+
 const cookieSession = require("cookie-session");
 const {
   getSessionFromStorage,
@@ -33,8 +38,8 @@ app.get("/login", async (req: Request, res: Response) => {
 
   await session.login({
     oidcIssuer: loginURL ?? SOLID_DOMAIN, // "https://solidcommunity.net" "https://login.inrupt.com"
-    redirectUrl: `${EXPRESS_FULL_URL}/login/callback?slackUUID=${slackUUID}`,
-    clientName: "Solid Slack Bridge",
+    redirectUrl: `${EXPRESS_FULL_URL}/login/callback`,
+    clientName: "The Ultimate Bookkeeping System",
     handleRedirect: (url: any) => res.redirect(url),
   });
 });
@@ -46,19 +51,15 @@ app.get("/login/callback", async (req: Request, res: Response) => {
   await session?.handleIncomingRedirect(`${EXPRESS_FULL_URL}${req.url}`);
 
   if (session?.info.webId && session?.info.isLoggedIn) {
-    const slackUUID = req.query.slackUUID as string;
-    sessionStore.saveSession(slackUUID, session);
-    return res.redirect('http://exampe.com');
+    return res.redirect('http://example.com');
   }
 });
 
 // Endpoint to forget a session. Currently not used.
 app.get("/logout", async (req: Request, res: Response, next: NextFunction) => {
-  const slackUUID = req.query.slackUUID as string;
   const session = await getSessionFromStorage(req.session?.sessionId);
   session?.logout();
-  sessionStore.removeSession(slackUUID);
-  return res.redirect('http://exampe.com');
+  return res.redirect('http://example.com');
 
 });
 
