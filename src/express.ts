@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
-import { storage } from "./storage";
+// import { storage } from "./memory";
+import { storage } from "./postgres";
 
 export const EXPRESS_PORT = +(process.env.EXPRESS_PORT || 8000)
 

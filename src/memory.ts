@@ -3,6 +3,7 @@ class Storage implements IStorage {
   private data: {
     [key: string]: string
   } = {};
+
   async delete(key: string): Promise<void> {
     delete this.data[key];
   }
