@@ -11,5 +11,5 @@ import { storage } from "./postgres";
   });
   await client.connect();
   storage.setClient(client);
-  await expressApp.listen(EXPRESS_PORT, () => console.log(`Express app running on ${EXPRESS_PORT}. Please visit ${EXPRESS_FULL_URL}/login`));
+  await expressApp.listen(EXPRESS_PORT, () => console.log(`Express app running on ${EXPRESS_PORT}. Please visit ${EXPRESS_FULL_URL}/`));
 })();
