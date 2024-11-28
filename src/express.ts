@@ -8,24 +8,24 @@ import {
 
 export function getExpressRoutes(storage: Storage, EXPRESS_FULL_URL: string): { [route: string]: (req: Request, res: Response, next: NextFunction) => Promise<void>} {
   return {
-    "/": async (req: Request, res: Response) => {
+    "/solid": async (req: Request, res: Response) => {
       const session = await getSessionFromStorage(req.session?.sessionId, storage);
       if (session?.info.webId && session?.info.isLoggedIn) {
-        res.status(200).send(`Hello ${session?.info.webId}<br><input type="submit" value="log out" onclick="location='/logout';">`);
+        res.status(200).send(`Hello ${session?.info.webId}<br><input type="submit" value="log out of Solid" onclick="location='/solid/logout';"><br><a href="/">to main page</a>`);
       } else {
         res.status(200).send([
-          `<input type="submit" value="pivot.pondersource.com" onclick="location='/login?server=pivot.pondersource.com';"><br>`,
-          `<input type="submit" value="solidcommunity.net" onclick="location='/login?server=solidcommunity.net';"><br>`,
-          `<input type="submit" value="inrupt.net" onclick="location='/login?server=inrupt.net';"><br>`,
+          `<input type="submit" value="pivot.pondersource.com" onclick="location='/solid/login?server=pivot.pondersource.com';"><br>`,
+          `<input type="submit" value="solidcommunity.net" onclick="location='/solid/login?server=solidcommunity.net';"><br>`,
+          `<input type="submit" value="inrupt.net" onclick="location='/solid/login?server=inrupt.net';"><br>`,
           `<input type="text" placeholder="bring your own" id="fill">`,
-          `<input type="submit" value="go" onclick="location='/login?server=' + document.getElementById('fill').value;"><br>`,
-          
+          `<input type="submit" value="go" onclick="location='/solid/login?server=' + document.getElementById('fill').value;"><br>`,
+          `<br><a href="/">to main page</a>`
         ].join('\n'));
       }
     },
     
     // Login end point to authenticate with a Solid identity provider
-    "/login": async (req: Request, res: Response) => {
+    "/solid/login": async (req: Request, res: Response) => {
       const session = new Session({ storage });
       const loginURL = req.query.loginURL as string;
       
@@ -35,14 +35,14 @@ export function getExpressRoutes(storage: Storage, EXPRESS_FULL_URL: string): { 
       
       await session.login({
         oidcIssuer: `https://${req.query.server}`,
-        redirectUrl: `${EXPRESS_FULL_URL}/login/callback`,
+        redirectUrl: `${EXPRESS_FULL_URL}/solid/login/callback`,
         clientName: "The Ultimate Bookkeeping System",
         handleRedirect: (url: any) => res.redirect(url),
       });
     },
     
     // Login callback receives the session and stores it in memory
-    "/login/callback": async (req: Request, res: Response) => {
+    "/solid/login/callback": async (req: Request, res: Response) => {
       const session = await getSessionFromStorage(req.session?.sessionId, storage);
       // console.log(session);
       // console.log(`handling incoming redirect`, `${EXPRESS_FULL_URL}${req.url}`);
@@ -51,15 +51,15 @@ export function getExpressRoutes(storage: Storage, EXPRESS_FULL_URL: string): { 
       
       if (session?.info.webId && session?.info.isLoggedIn) {
         // return res.redirect('logged in');
-        await res.redirect('/');
+        await res.redirect('/solid');
       }
     },
     
-    // Endpoint to forget a session. Currently not used.
-    "/logout": async (req: Request, res: Response, next: NextFunction) => {
+    // Endpoint to forget a session.
+    "/solid/logout": async (req: Request, res: Response, next: NextFunction) => {
       const session = await getSessionFromStorage(req.session?.sessionId, storage);
       session?.logout();
-      await res.redirect('/');
+      await res.redirect('/solid');
     },
   };
 }
