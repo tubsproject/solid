@@ -1,13 +1,18 @@
 import { Client } from 'pg';
-import { runExpress } from "./express";
-import { storage } from "./postgres";
+
+import { getExpressRoutes } from "./express";
+import { Storage } from "./postgres";
 
 export class SolidClient {
+  storage: Storage;
   constructor(client: Client) {
-    storage.setClient(client);
+    this.storage = new Storage();
+    this.storage.setClient(client);
   }
-  async listen(port: number, fullExpressUrl: string) {
-    const expressApp = await runExpress(fullExpressUrl);
-    await expressApp.listen(port);
+  addRoutesInExpress(expressApp: any, fullExpressUrl: string) {
+    const routes = getExpressRoutes(this.storage, fullExpressUrl);
+    Object.keys(routes).forEach(route => {
+      expressApp.get(route, routes[route]);
+    });
   }
 }

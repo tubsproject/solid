@@ -1,6 +1,7 @@
 import { Client } from 'pg';
 import { IStorage } from "@inrupt/solid-client-authn-node";
-class Storage implements IStorage {
+
+export class Storage implements IStorage {
   private client: Client | undefined;
 
   setClient(client: Client) {
@@ -37,4 +38,3 @@ class Storage implements IStorage {
     ]);
   }
 }
-export const storage = new Storage();
