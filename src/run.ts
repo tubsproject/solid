@@ -2,7 +2,6 @@ import { Client } from 'pg';
 import { SolidClient } from "./index";
 
 const EXPRESS_PORT = +(process.env.EXPRESS_PORT || 8000);
-
 const EXPRESS_FULL_URL = process.env.EXPRESS_FULL_URL || `http://localhost:${EXPRESS_PORT}`;
 
 (async () => {
