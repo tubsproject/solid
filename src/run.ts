@@ -1,10 +1,11 @@
 import { Client } from 'pg';
 import express from "express";
 import cookieSession from "cookie-session";
-import { SolidClient } from "./index";
+import { Solid } from "./index";
 
 const EXPRESS_PORT = +(process.env.EXPRESS_PORT || 8000);
-const EXPRESS_FULL_URL = process.env.EXPRESS_FULL_URL || `http://localhost:${EXPRESS_PORT}`;
+const EXPRESS_HOST = process.env.EXPRESS_HOST || `http://localhost:${EXPRESS_PORT}`;
+const EXPRESS_PATH = '';
 
 (async () => {
   const postgresClient = new Client({
@@ -29,8 +30,12 @@ const EXPRESS_FULL_URL = process.env.EXPRESS_FULL_URL || `http://localhost:${EXP
     })
   ); 
   
-  const solidClient = new SolidClient(postgresClient);
-  solidClient.addRoutesInExpress(expressApp, EXPRESS_FULL_URL);
+  const solidClient = new Solid(postgresClient);
+  const routes = solidClient.getExpressRoutes(EXPRESS_HOST, EXPRESS_PATH);
+  console.log(Object.keys(routes));
+  Object.keys(routes).forEach(route => {
+    expressApp.get(route, routes[route]);
+  });
   await new Promise(resolve => expressApp.listen(EXPRESS_PORT, () => resolve(undefined)));
-  console.log(`Express app running on ${EXPRESS_PORT}. Please visit ${EXPRESS_FULL_URL}/`);
+  console.log(`Express app running on ${EXPRESS_PORT}. Please visit ${EXPRESS_HOST}${EXPRESS_PATH}`);
 })();
