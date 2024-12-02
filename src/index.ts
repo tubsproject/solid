@@ -28,10 +28,11 @@ export class Solid extends DataHome {
   getExpressRoutes(host: string, path: string): { [route: string]: (req: Request, res: Response, next: NextFunction) => Promise<void>} {
     return {
       [`${path}/`]: async (req: Request, res: Response) => {
-        const webId = this.getWebId(req);
+        const webId = await this.getWebId(req);
         if (webId) {
           this.emit('login', 'solid', webId);
-          res.status(200).send(`Hello ${webId}<br><input type="submit" value="log out of Solid" onclick="location='${path}/logout';"><br><a href="/">to main page</a>`);
+          // res.status(200).send(`Hello ${webId}<br><input type="submit" value="log out of Solid" onclick="location='${path}/logout';"><br><a href="/">to main page</a>`);
+          await res.redirect(`/`);
         } else {
           res.status(200).send([
             `<input type="submit" value="pivot.pondersource.com" onclick="location='${path}/login?server=pivot.pondersource.com';"><br>`,
