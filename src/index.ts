@@ -17,14 +17,21 @@ export class Solid extends DataHome {
     this.storage = new Storage();
     this.storage.setClient(client);
   }
+  async getWebId(req: Request): Promise<string | undefined> {
+    const session = await getSessionFromStorage(req.session?.sessionId, this.storage);
+    if (session?.info.webId && session?.info.isLoggedIn) {
+      return session?.info.webId;
+    }
+    return undefined;
+  }
 
   getExpressRoutes(host: string, path: string): { [route: string]: (req: Request, res: Response, next: NextFunction) => Promise<void>} {
     return {
       [`${path}/`]: async (req: Request, res: Response) => {
-        const session = await getSessionFromStorage(req.session?.sessionId, this.storage);
-        if (session?.info.webId && session?.info.isLoggedIn) {
-          this.emit('login', 'solid', session?.info.webId);
-          res.status(200).send(`Hello ${session?.info.webId}<br><input type="submit" value="log out of Solid" onclick="location='${path}/logout';"><br><a href="/">to main page</a>`);
+        const webId = this.getWebId(req);
+        if (webId) {
+          this.emit('login', 'solid', webId);
+          res.status(200).send(`Hello ${webId}<br><input type="submit" value="log out of Solid" onclick="location='${path}/logout';"><br><a href="/">to main page</a>`);
         } else {
           res.status(200).send([
             `<input type="submit" value="pivot.pondersource.com" onclick="location='${path}/login?server=pivot.pondersource.com';"><br>`,
