@@ -61,7 +61,7 @@ export class Solid extends DataHome {
         // console.log(session);
         // console.log(`handling incoming redirect`, `${EXPRESS_FULL_URL}${req.url}`);
         
-        await session?.handleIncomingRedirect(`${host}${path}${req.url}`);
+        await session?.handleIncomingRedirect(`${host}${req.url}`);
         
         if (session?.info.webId && session?.info.isLoggedIn) {
           // return res.redirect('logged in');
