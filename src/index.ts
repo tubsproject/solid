@@ -17,8 +17,11 @@ export class Solid extends DataHome {
     this.storage = new Storage();
     this.storage.setClient(client);
   }
+  async getSession(req: Request): Promise<Session | undefined> {
+    return getSessionFromStorage(req.session?.sessionId, this.storage);
+  }
   async getWebId(req: Request): Promise<string | undefined> {
-    const session = await getSessionFromStorage(req.session?.sessionId, this.storage);
+    const session = await this.getSession(req);
     if (session?.info.webId && session?.info.isLoggedIn) {
       return session?.info.webId;
     }
